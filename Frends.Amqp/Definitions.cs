@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using System;
-using Amqp.Types;
 using System.ComponentModel.DataAnnotations;
 
 #pragma warning disable 1591
@@ -102,18 +101,6 @@ namespace Frends.Amqp.Definitions
         public bool Success;
     }
 
-    public class ReceiveMessageResult
-    {
-        /// <summary>
-        /// True if Message was received successfully.
-        /// </summary>
-        public bool Success;
-        /// <summary>
-        /// The body (content) of the message.
-        /// </summary>
-        public object Body;
-    }
-
     public class AmqpMessage
     {
         /// <summary>
@@ -211,7 +198,4 @@ namespace Frends.Amqp.Definitions
         File
     };
     // Yet Another way https://github.com/Azure/amqpnetlite/blob/master/Examples/PeerToPeer/PeerToPeer.Certificate/Program.cs
-
-
-
 }

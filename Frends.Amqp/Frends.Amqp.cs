@@ -30,7 +30,6 @@ namespace Frends.Amqp
         public static async Task<SendMessageResult> AmqpSend([PropertyTab] InputSender input, [PropertyTab] Options options, [PropertyTab] AmqpMessageProperties messageProperties, CancellationToken cancellationToken)
         {
             var conn = await CreateConnection(input.BusUri, options.SearchClientCertificateBy, options.DisableServerCertValidation, options.Issuer, options.PfxFilePath, options.PfxPassword);
-            //var newConn = await CreateConnection(input.BusUri, null, true);
             var session = new Session(conn);
             var sender = new SenderLink(session, options.LinkName, input.QueueOrTopicName);
 
@@ -129,32 +128,18 @@ namespace Frends.Amqp
 
             if (searchClientCertificateBy == SearchCertificateBy.DontUseCertificate)
             {
-                // Don't authenticate with client cert
-
-                if (disableServerCertValidation == true)
+                if (disableServerCertValidation)
                 {
                     factory.SSL.RemoteCertificateValidationCallback = noneCertValidator;
                 }
-                var conn = await factory.CreateAsync(brokerAddress); //.ConfigureAwait(false).GetAwaiter().GetResult();
-                return conn;
+                return await factory.CreateAsync(brokerAddress);
             }
             else
             {
-                // Do authenticate with client cert
-
-                if (disableServerCertValidation == true) // Do NOT validate server certificate
+                if (disableServerCertValidation)
                 {
                     factory.SSL.RemoteCertificateValidationCallback = noneCertValidator;
                 }
-
-                // TODO how is cert validated when following code is commented out
-                /*
-                 else
-                {
-                    factory.SSL.RemoteCertificateValidationCallback = ValidateServerCertificate;
-                }
-                */
-
 
                 X509Certificate2 certificate;
                 if (searchClientCertificateBy == SearchCertificateBy.File)

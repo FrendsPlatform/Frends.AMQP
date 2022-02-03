@@ -1,10 +1,7 @@
 ﻿{
 	"Tasks": [
 		{
-			"TaskMethod": "Frends.Amqp.Amqp.AmqpReceiver"
-		},
-		{
-			"TaskMethod": "Frends.Amqp.Amqp.AmqpSender"
+			"TaskMethod": "Frends.Amqp.Send.AmqpSend"
 		}
 	]
 }
