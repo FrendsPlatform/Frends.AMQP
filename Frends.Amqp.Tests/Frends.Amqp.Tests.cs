@@ -2,50 +2,57 @@ using System;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Frends.Amqp.Definitions;
+using System.Diagnostics;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
+using System.Net.Sockets;
+using System.Net;
 
 namespace Frends.Amqp.Tests
 {
     [TestFixture]
     class TestClass
     {
-        /// These tests here use a test AMQP server.
+        /// These tests here use a test AMQP server. The test server is started and killed automatically.
         /// https://github.com/Azure/amqpnetlite/tree/master/test/TestAmqpBroker
-        /// Start AMQP server before executing test by (ensure that you use same addresses in command and in tests):
-        /// .\TestAmqpBroker.exe amqp://localhost:5676 amqps://localhost:5677 /creds:guest:guest /cert:localhost
-        /// If you have valid tls cert you may want to enable cert validation.
         /// 
         /// If you want to test this against a real ActiveMQ server, Docker is recommended:
         /// docker pull rmohr/activemq
         /// docker run -p 5672:5672 -p 8161:8161 rmohr/activemq
 
-        private static readonly string insecureBusAddress = "amqp://guest:guest@localhost:5676";
-        private static readonly string secureBusAddress = "amqps://guest:guest@localhost:5677";
         private static readonly string queue = "q1";
         private static readonly bool disableServerCertValidation = true;
 
-        private static readonly AmqpProperties properties = new AmqpProperties
+        private static readonly AmqpProperties properties = new()
         {
             MessageId = Guid.NewGuid().ToString()
         };
 
-        private static readonly AmqpMessage testMessage = new AmqpMessage()
+        private static readonly AmqpMessage testMessage = new()
         {
             BodyAsString = "Hello AMQP!",
         };
 
-        static readonly AmqpMessageProperties amqpMessageProperties = new AmqpMessageProperties
+        private static Process TestAmqpBrokerProcess;
+        private static int[] TestAmqpBrokerPorts;
+
+        private static string InsecureBusAddress => $"amqp://guest:guest@localhost:{TestAmqpBrokerPorts[0]}";
+        private static string SecureBusAddress => $"amqps://guest:guest@localhost:{TestAmqpBrokerPorts[1]}";
+
+        static readonly AmqpMessageProperties amqpMessageProperties = new()
         {
-            ApplicationProperties = new ApplicationProperty[] { },
+            ApplicationProperties = Array.Empty<ApplicationProperty>(),
             Properties = properties
         };
 
-        static InputSender inputSender = new InputSender
+        static readonly InputSender inputSender = new()
         {
             Message = testMessage,
             QueueOrTopicName = queue,
         };
 
-        static Options optionsDontUseClientCert = new Options
+        static readonly Options optionsDontUseClientCert = new()
         {
             Timeout = 15,
             LinkName = Guid.NewGuid().ToString(),
@@ -53,24 +60,145 @@ namespace Frends.Amqp.Tests
             DisableServerCertValidation = disableServerCertValidation
         };
 
+        /// <summary>
+        /// Extracts TestAmqpBroker.zip to current directory and returns full path of TestAmqpBroker.exe file.
+        /// </summary>
+        /// <exception cref="FileNotFoundException">
+        /// Thrown if either TestAmqpBroker.zip is not found, or if
+        /// TestAmqpBroker.exe is not found after zip extraction.
+        /// </exception>
+        private static string ExtractTestBrokerZip()
+        {
+            var zipFilePath = Path.Combine(Environment.CurrentDirectory, "TestAmqpBroker.zip");
+            var extractedDirPath = Path.Combine(Environment.CurrentDirectory, "TestAmqpBroker");
+
+            if (!File.Exists(zipFilePath))
+            {
+                throw new FileNotFoundException("Can't find TestAmqpBroker.zip from current directory.");
+            }
+
+            if (Directory.Exists(extractedDirPath)) {
+                Directory.Delete(extractedDirPath, true);
+            }
+
+            ZipFile.ExtractToDirectory(zipFilePath, extractedDirPath);
+
+            return GetTestBrokerPath();
+        }
+
+        private static string GetTestBrokerPath()
+        {
+            var extractedDirPath = Path.Combine(Environment.CurrentDirectory, "TestAmqpBroker");
+            var extractedExeFilePath = Directory.GetFiles(extractedDirPath, "TestAmqpBroker.exe", SearchOption.AllDirectories).FirstOrDefault();
+            if (string.IsNullOrEmpty(extractedExeFilePath))
+            {
+                throw new FileNotFoundException("Can't find TestAmqpBroker.exe.");
+            }
+            else
+            {
+                return extractedExeFilePath;
+            }
+        }
+
+        private static Process RunTestBroker(string testBrokerExePath, string args)
+        {
+            var process = Process.Start(new ProcessStartInfo(testBrokerExePath)
+            {
+                Arguments = args
+            });
+            Console.WriteLine("TestAmqpBroker started.");
+            return process;
+        }
+
+        private static void EnsureTestBrokerIsRunning()
+        {
+            if (TestAmqpBrokerProcess == null) 
+            {
+                var exePath = EnsureTestBrokerIsExtracted();
+                TestAmqpBrokerPorts = new[] { NextFreeTcpPort(), NextFreeTcpPort() };
+                TestAmqpBrokerProcess = RunTestBroker(exePath, $"amqp://localhost:{TestAmqpBrokerPorts[0]} amqps://localhost:{TestAmqpBrokerPorts[1]} /creds:guest:guest /cert:localhost");
+            }
+        }
+
+        private static string EnsureTestBrokerIsExtracted()
+        {
+            var zipFilePath = Path.Combine(Environment.CurrentDirectory, "TestAmqpBroker.zip");
+            var extractedDirPath = Path.Combine(Environment.CurrentDirectory, "TestAmqpBroker");
+            if (Directory.Exists(extractedDirPath))
+            {
+                if (!File.Exists(zipFilePath))
+                {
+                    throw new FileNotFoundException("Can't find TestAmqpBroker.zip from current directory.");
+                }
+                var zipArchive = ZipFile.OpenRead(zipFilePath);
+                foreach (var entry in zipArchive.Entries)
+                {
+                    if (!File.Exists(Path.Combine(extractedDirPath, entry.Name)))
+                    {
+                        entry.ExtractToFile(Path.Combine(extractedDirPath, entry.Name));
+                    }
+                }
+            } else
+            {
+                ExtractTestBrokerZip();
+            }
+
+            return GetTestBrokerPath();
+        }
+
+        private static void KillTestBroker()
+        {
+            if (TestAmqpBrokerProcess != null)
+            {
+                TestAmqpBrokerProcess.Kill(true);
+                TestAmqpBrokerProcess = null;
+            }
+            
+            var processes = Process.GetProcessesByName("TestAmqpBroker.exe");
+            if (processes?.Length > 0)
+            {
+                foreach (var process in processes)
+                {
+                    process.Kill();
+                };
+            }
+        }
+
+        private static int NextFreeTcpPort()
+        {
+            TcpListener l = new TcpListener(IPAddress.Loopback, 0);
+            l.Start();
+            int port = ((IPEndPoint)l.LocalEndpoint).Port;
+            l.Stop();
+            return port;
+        }
+
         [Test]
         public async Task TestInsecure()
         {
-            inputSender.BusUri = insecureBusAddress;
+            KillTestBroker();
+            EnsureTestBrokerIsRunning();
+
+            inputSender.BusUri = InsecureBusAddress;
             var ret = await Send.AmqpSend(inputSender, optionsDontUseClientCert, amqpMessageProperties, new System.Threading.CancellationToken());
             Assert.NotNull(ret);
             Assert.That(ret.Success, Is.True);
+
+            KillTestBroker();
         }
 
         [Test]
         public async Task TestWithSecureConnection()
         {
-            inputSender.BusUri = secureBusAddress;
+            KillTestBroker();
+            EnsureTestBrokerIsRunning();
 
+            inputSender.BusUri = SecureBusAddress;
             var ret = await Send.AmqpSend(inputSender, optionsDontUseClientCert, amqpMessageProperties, new System.Threading.CancellationToken());
-
             Assert.NotNull(ret);
             Assert.That(ret.Success, Is.True);
+
+            KillTestBroker();
         }
     }
 }
