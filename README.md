@@ -2,6 +2,8 @@
 
 [Frends](https://frends.com/) task for sending Advanced Message Queuing Protocol (= AMQP) messages.
 
+# Table of contents
+
 [Installation](#installation)
 
 [Parameters](#Parameters)
