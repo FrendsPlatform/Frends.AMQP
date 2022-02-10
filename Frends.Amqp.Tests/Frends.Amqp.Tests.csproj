@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net6.0</TargetFrameworks>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AMQPNetLite" Version="2.4.3" />
+    <PackageReference Include="nunit" Version="3.10.1" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
+    <PackageReference Include="System.IO.Compression.ZipFile" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Frends.Amqp\Frends.Amqp.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="TestAmqpBroker.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

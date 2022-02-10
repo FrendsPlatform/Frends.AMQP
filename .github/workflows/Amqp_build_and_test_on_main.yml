@@ -1,0 +1,20 @@
+name: Frends.Amqp Main
+
+on:
+  push:
+    branches:    
+      - main
+    paths:
+      - 'Frends.Amqp/**'
+      - 'Frends.Amqp.Tests/**'
+  workflow_dispatch:
+  
+
+jobs:
+  build:
+    uses: FrendsPlatform/FrendsTasks/.github/workflows/build_main.yml@main
+    with:
+      workdir: Frends.Amqp
+    secrets:
+      badge_service_api_key: ${{ secrets.BADGE_SERVICE_API_KEY }}
+      
