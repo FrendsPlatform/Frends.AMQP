@@ -101,7 +101,7 @@ dotnet pack Frends.Amqp
 
 # Testing
 
-Running tests in the Tests project requires TestAmqpBroker.exe to be running. [TestAmqpBroker is part of azure-amqp repository](https://github.com/Azure/azure-amqp/tree/master/test/TestAmqpBroker), but it is included in this repository as well, for testing purposes.
+Tests automate running and stopping TestAmqpBroker, which is used to mock an ActiveMQ server. [TestAmqpBroker is part of azure-amqp repository](https://github.com/Azure/azure-amqp/tree/master/test/TestAmqpBroker), but it is included in this repository as well as a zip file.
 
 # Contributing
 
