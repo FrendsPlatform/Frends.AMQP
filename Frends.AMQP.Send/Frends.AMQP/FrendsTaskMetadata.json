@@ -1,7 +1,7 @@
 ﻿{
 	"Tasks": [
 		{
-			"TaskMethod": "Frends.Amqp.Send.AmqpSend"
+			"TaskMethod": "Frends.AMQP.Send.AMQP.Send"
 		}
 	]
 }
