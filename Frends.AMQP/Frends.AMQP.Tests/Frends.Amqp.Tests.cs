@@ -102,10 +102,11 @@ namespace Frends.Amqp.Tests
 
         private static Process RunTestBroker(string testBrokerExePath, string args)
         {
-            var process = Process.Start(new ProcessStartInfo(testBrokerExePath)
-            {
-                Arguments = args
-            });
+            var pdi = new ProcessStartInfo();
+            pdi.UseShellExecute = false;
+            pdi.FileName = testBrokerExePath;
+            pdi.Arguments = args;
+            var process = Process.Start(pdi);
             Console.WriteLine("TestAmqpBroker started.");
             return process;
         }
