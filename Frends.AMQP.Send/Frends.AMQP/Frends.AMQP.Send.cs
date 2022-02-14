@@ -12,9 +12,9 @@ using System.Threading;
 
 #pragma warning disable 1591
 
-namespace Frends.Amqp
+namespace Frends.AMQP.Send
 {
-    public static class Send
+    public static class AMQP
     {
         static readonly RemoteCertificateValidationCallback noneCertValidator = (a, b, c, d) => true;
 
@@ -27,7 +27,7 @@ namespace Frends.Amqp
         /// <param name="messageProperties">Defines additional properties of messgae.</param>
         /// <param name="cancellationToken"></param>
         /// <returns>Object { bool Success }</returns>
-        public static async Task<SendMessageResult> AmqpSend([PropertyTab] InputSender input, [PropertyTab] Options options, [PropertyTab] AmqpMessageProperties messageProperties, CancellationToken cancellationToken)
+        public static async Task<SendMessageResult> Send([PropertyTab] InputSender input, [PropertyTab] Options options, [PropertyTab] AmqpMessageProperties messageProperties, CancellationToken cancellationToken)
         {
             var conn = await CreateConnection(input.BusUri, options.SearchClientCertificateBy, options.DisableServerCertValidation, options.Issuer, options.PfxFilePath, options.PfxPassword);
             var session = new Session(conn);

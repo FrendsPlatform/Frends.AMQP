@@ -1,12 +1,11 @@
-name: Frends.Amqp Test
+name: Frends.AMQP.Send Test
 
 on:
   push:
     branches-ignore:
       - main
     paths:
-      - 'Frends.Amqp/**'
-      - 'Frends.Amqp.Tests/**'
+      - 'Frends.AMQP.Send/**'
   workflow_dispatch:
   
 

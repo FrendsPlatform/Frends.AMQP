@@ -1,4 +1,4 @@
-name: Frends.Amqp Release
+name: Frends.AMQP.Send Release
 
 on:
   workflow_dispatch:
