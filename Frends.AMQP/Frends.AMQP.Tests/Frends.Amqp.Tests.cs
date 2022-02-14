@@ -174,13 +174,13 @@ namespace Frends.Amqp.Tests
         }
 
         [Test]
-        public async Task TestInsecure()
+        public void TestInsecure()
         {
             KillTestBroker();
             EnsureTestBrokerIsRunning();
 
             inputSender.BusUri = InsecureBusAddress;
-            var ret = await Send.AmqpSend(inputSender, optionsDontUseClientCert, amqpMessageProperties, new System.Threading.CancellationToken());
+            var ret = Send.AmqpSend(inputSender, optionsDontUseClientCert, amqpMessageProperties, new System.Threading.CancellationToken()).GetAwaiter().GetResult();
             Assert.NotNull(ret);
             Assert.That(ret.Success, Is.True);
 
@@ -188,13 +188,13 @@ namespace Frends.Amqp.Tests
         }
 
         [Test]
-        public async Task TestWithSecureConnection()
+        public void TestWithSecureConnection()
         {
             KillTestBroker();
             EnsureTestBrokerIsRunning();
 
             inputSender.BusUri = SecureBusAddress;
-            var ret = await Send.AmqpSend(inputSender, optionsDontUseClientCert, amqpMessageProperties, new System.Threading.CancellationToken());
+            var ret = Send.AmqpSend(inputSender, optionsDontUseClientCert, amqpMessageProperties, new System.Threading.CancellationToken()).GetAwaiter().GetResult();
             Assert.NotNull(ret);
             Assert.That(ret.Success, Is.True);
 
