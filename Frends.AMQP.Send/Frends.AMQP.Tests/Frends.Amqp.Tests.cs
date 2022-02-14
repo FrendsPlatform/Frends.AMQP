@@ -9,7 +9,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Net;
 
-namespace Frends.Amqp.Tests
+namespace Frends.AMQP.Send.Tests
 {
     [TestFixture]
     class TestClass
@@ -181,7 +181,7 @@ namespace Frends.Amqp.Tests
             EnsureTestBrokerIsRunning();
 
             inputSender.BusUri = InsecureBusAddress;
-            var ret = await Send.AmqpSend(inputSender, optionsDontUseClientCert, amqpMessageProperties, new System.Threading.CancellationToken());
+            var ret = await AMQP.Send(inputSender, optionsDontUseClientCert, amqpMessageProperties, new System.Threading.CancellationToken());
             Assert.NotNull(ret);
             Assert.That(ret.Success, Is.True);
 
@@ -196,7 +196,7 @@ namespace Frends.Amqp.Tests
             EnsureTestBrokerIsRunning();
 
             inputSender.BusUri = SecureBusAddress;
-            var ret = await Send.AmqpSend(inputSender, optionsDontUseClientCert, amqpMessageProperties, new System.Threading.CancellationToken());
+            var ret = await AMQP.Send(inputSender, optionsDontUseClientCert, amqpMessageProperties, new System.Threading.CancellationToken());
             Assert.NotNull(ret);
             Assert.That(ret.Success, Is.True);
 
