@@ -1,64 +1,24 @@
-using System;
-using System.Threading.Tasks;
-using NUnit.Framework;
-using Frends.Amqp.Definitions;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Net.Sockets;
 using System.Net;
+using System.Net.Sockets;
 
-namespace Frends.Amqp.Tests
+namespace Frends.AMQP.Send.Tests
 {
-    [TestFixture]
-    class TestClass
+    /// These tests here use a test AMQP server. The test server is started and killed automatically.
+    /// https://github.com/Azure/amqpnetlite/tree/master/test/TestAmqpBroker
+    /// 
+    /// If you want to test this against a real ActiveMQ server, Docker is recommended:
+    /// docker pull rmohr/activemq
+    /// docker run -p 5672:5672 -p 8161:8161 rmohr/activemq
+
+    internal static class TestAmqpBrokerHelper
     {
-        /// These tests here use a test AMQP server. The test server is started and killed automatically.
-        /// https://github.com/Azure/amqpnetlite/tree/master/test/TestAmqpBroker
-        /// 
-        /// If you want to test this against a real ActiveMQ server, Docker is recommended:
-        /// docker pull rmohr/activemq
-        /// docker run -p 5672:5672 -p 8161:8161 rmohr/activemq
-
-        private static readonly string queue = "q1";
-        private static readonly bool disableServerCertValidation = true;
-
-        private static readonly AmqpProperties properties = new()
-        {
-            MessageId = Guid.NewGuid().ToString()
-        };
-
-        private static readonly AmqpMessage testMessage = new()
-        {
-            BodyAsString = "Hello AMQP!",
-        };
-
         private static Process TestAmqpBrokerProcess;
-        private static int[] TestAmqpBrokerPorts;
-
-        private static string InsecureBusAddress => $"amqp://guest:guest@localhost:{TestAmqpBrokerPorts[0]}";
-        private static string SecureBusAddress => $"amqps://guest:guest@localhost:{TestAmqpBrokerPorts[1]}";
-
-        static readonly AmqpMessageProperties amqpMessageProperties = new()
-        {
-            ApplicationProperties = Array.Empty<ApplicationProperty>(),
-            Properties = properties
-        };
-
-        static readonly InputSender inputSender = new()
-        {
-            Message = testMessage,
-            QueueOrTopicName = queue,
-        };
-
-        static readonly Options optionsDontUseClientCert = new()
-        {
-            Timeout = 15,
-            LinkName = Guid.NewGuid().ToString(),
-            SearchClientCertificateBy = SearchCertificateBy.DontUseCertificate,
-            DisableServerCertValidation = disableServerCertValidation
-        };
+        internal static int[] TestAmqpBrokerPorts;
 
         /// <summary>
         /// Extracts TestAmqpBroker.zip to current directory and returns full path of TestAmqpBroker.exe file.
@@ -77,7 +37,8 @@ namespace Frends.Amqp.Tests
                 throw new FileNotFoundException("Can't find TestAmqpBroker.zip from current directory.");
             }
 
-            if (Directory.Exists(extractedDirPath)) {
+            if (Directory.Exists(extractedDirPath))
+            {
                 Directory.Delete(extractedDirPath, true);
             }
 
@@ -110,9 +71,9 @@ namespace Frends.Amqp.Tests
             return process;
         }
 
-        private static void EnsureTestBrokerIsRunning()
+        internal static void EnsureTestBrokerIsRunning()
         {
-            if (TestAmqpBrokerProcess == null) 
+            if (TestAmqpBrokerProcess == null)
             {
                 var exePath = EnsureTestBrokerIsExtracted();
                 TestAmqpBrokerPorts = new[] { NextFreeTcpPort(), NextFreeTcpPort() };
@@ -138,7 +99,8 @@ namespace Frends.Amqp.Tests
                         entry.ExtractToFile(Path.Combine(extractedDirPath, entry.Name));
                     }
                 }
-            } else
+            }
+            else
             {
                 ExtractTestBrokerZip();
             }
@@ -146,14 +108,14 @@ namespace Frends.Amqp.Tests
             return GetTestBrokerPath();
         }
 
-        private static void KillTestBroker()
+        internal static void KillTestBroker()
         {
             if (TestAmqpBrokerProcess != null)
             {
                 TestAmqpBrokerProcess.Kill(true);
                 TestAmqpBrokerProcess = null;
             }
-            
+
             var processes = Process.GetProcessesByName("TestAmqpBroker.exe");
             if (processes?.Length > 0)
             {
@@ -171,36 +133,6 @@ namespace Frends.Amqp.Tests
             int port = ((IPEndPoint)l.LocalEndpoint).Port;
             l.Stop();
             return port;
-        }
-
-        [Test]
-        [Ignore("GitHub Actions problems with setting up broker")]
-        public async Task TestInsecure()
-        {
-            KillTestBroker();
-            EnsureTestBrokerIsRunning();
-
-            inputSender.BusUri = InsecureBusAddress;
-            var ret = await Send.AmqpSend(inputSender, optionsDontUseClientCert, amqpMessageProperties, new System.Threading.CancellationToken());
-            Assert.NotNull(ret);
-            Assert.That(ret.Success, Is.True);
-
-            KillTestBroker();
-        }
-
-        [Test]
-        [Ignore("GitHub Actions problems with setting up broker")]
-        public async Task TestWithSecureConnection()
-        {
-            KillTestBroker();
-            EnsureTestBrokerIsRunning();
-
-            inputSender.BusUri = SecureBusAddress;
-            var ret = await Send.AmqpSend(inputSender, optionsDontUseClientCert, amqpMessageProperties, new System.Threading.CancellationToken());
-            Assert.NotNull(ret);
-            Assert.That(ret.Success, Is.True);
-
-            KillTestBroker();
         }
     }
 }

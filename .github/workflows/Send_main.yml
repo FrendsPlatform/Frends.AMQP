@@ -13,7 +13,9 @@ jobs:
   build:
     uses: FrendsPlatform/FrendsTasks/.github/workflows/build_main.yml@main
     with:
+      env_var_name_1: AMQPS_CONN_STR
       workdir: Frends.AMQP.Send
     secrets:
+      env_var_value_1: ${{ secrets.AMQPS_CONN_STR }}
       badge_service_api_key: ${{ secrets.BADGE_SERVICE_API_KEY }}
       

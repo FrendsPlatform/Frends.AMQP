@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Frends.AMQP\Frends.AMQP.Send.csproj" />
+    <ProjectReference Include="..\Frends.AMQP.Send\Frends.AMQP.Send.csproj" />
   </ItemGroup>
 
   <ItemGroup>
