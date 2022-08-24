@@ -12,7 +12,7 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<PackageProjectUrl>https://frends.com/</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/FrendsPlatform/Frends.AMQP</RepositoryUrl>
-		<Description>Task for sending Advanced Message Queuing Protocol (= AMQP) messages. [Documentation](https://github.com/FrendsPlatform/Frends.AMQP/tree/main/Frends.AMQP.Send)</Description>
+		<Description>Task for sending Advanced Message Queuing Protocol (= AMQP) messages.</Description>
 	</PropertyGroup>
 
   <ItemGroup>
