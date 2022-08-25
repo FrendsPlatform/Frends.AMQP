@@ -20,8 +20,7 @@ Rebuild the project
 Run tests
 
 Docker commands if you want to test this against a real ActiveMQ server:
- `docker pull rmohr/activemq`
- `docker run -p 5672:5672 -p 8161:8161 rmohr/activemq`
+ `docker pull rmohr/activemq && docker run -d -p 5672:5672 -p 8161:8161 rmohr/activemq`
 
 `dotnet test`
 

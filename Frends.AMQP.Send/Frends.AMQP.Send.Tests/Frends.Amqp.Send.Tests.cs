@@ -15,16 +15,9 @@ public class AMQPSendTests
     [SetUp]
     public void SetUp()
     {
-        var externalAmqpsConnectionString = Environment.GetEnvironmentVariable("AMQPS_CONN_STR");
-
-        if (string.IsNullOrWhiteSpace(externalAmqpsConnectionString))
-        {
-            TestAmqpBrokerHelper.KillTestBroker();
-            TestAmqpBrokerHelper.EnsureTestBrokerIsRunning();
-            SecureBusAddress = $"amqps://guest:guest@localhost:{TestAmqpBrokerHelper.TestAmqpBrokerPorts[1]}";
-        }
-        else
-            SecureBusAddress = externalAmqpsConnectionString;
+        TestAmqpBrokerHelper.KillTestBroker();
+        TestAmqpBrokerHelper.EnsureTestBrokerIsRunning();
+        SecureBusAddress = $"amqps://guest:guest@localhost:{TestAmqpBrokerHelper.TestAmqpBrokerPorts[1]}";
     }
 
     [TearDown]

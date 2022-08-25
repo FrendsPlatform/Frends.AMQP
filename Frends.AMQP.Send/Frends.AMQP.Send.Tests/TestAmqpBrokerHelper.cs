@@ -13,7 +13,7 @@ namespace Frends.AMQP.Send.Tests;
 /// 
 /// If you want to test this against a real ActiveMQ server, Docker is recommended:
 /// docker pull rmohr/activemq
-/// docker run -p 5672:5672 -p 8161:8161 rmohr/activemq
+/// docker run -d -p 5672:5672 -p 8161:8161 rmohr/activemq
 
 internal static class TestAmqpBrokerHelper
 {
