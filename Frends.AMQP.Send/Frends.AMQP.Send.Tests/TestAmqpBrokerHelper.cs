@@ -11,7 +11,7 @@ namespace Frends.AMQP.Send.Tests
     internal static class TestAmqpBrokerHelper
     {
         private static Process TestAmqpBrokerProcess;
-        internal static int[] TestAmqpBrokerPorts;
+        internal static int[] TestAmqpBrokerPorts; 
 
         private static string ExtractTestBrokerZip()
         {
