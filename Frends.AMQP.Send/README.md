@@ -12,18 +12,13 @@ You can install the Task via frends UI Task View or you can find the NuGet packa
 
 ## Building
 
-
 Rebuild the project
 
 `dotnet build`
 
 Run tests
 
-Docker commands if you want to test this against a real ActiveMQ server:
- `docker pull rmohr/activemq && docker run -d -p 5672:5672 -p 8161:8161 rmohr/activemq`
-
 `dotnet test`
-
 
 Create a NuGet package
 
