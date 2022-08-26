@@ -17,7 +17,7 @@ public class AMQPSendTests
     {
         var externalAmqpsConnectionString = Environment.GetEnvironmentVariable("AMQPS_CONN_STR");
 
-        if (string.IsNullOrWhiteSpace(externalAmqpsConnectionString)) 
+        if (string.IsNullOrWhiteSpace(externalAmqpsConnectionString))
         {
             TestAmqpBrokerHelper.KillTestBroker();
             TestAmqpBrokerHelper.EnsureTestBrokerIsRunning();

@@ -14,4 +14,5 @@ jobs:
     with:
       workdir: Frends.AMQP.Send
     secrets:
+      env_var_value_1: ${{ secrets.AMQPS_CONN_STR }}
       badge_service_api_key: ${{ secrets.BADGE_SERVICE_API_KEY }}
