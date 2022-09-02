@@ -57,7 +57,7 @@ public class AMQPSendTests
             Properties = new AmqpProperties { MessageId = Guid.NewGuid().ToString() }
         };
 
-        var ret = await AMQP.Send(sender, optionsDontUseClientCert, amqpMessageProperties, new CancellationToken());
+        var ret = await AMQP.Send(sender, optionsDontUseClientCert, amqpMessageProperties);
         Assert.NotNull(ret);
         Assert.That(ret.Success, Is.True);
     }
