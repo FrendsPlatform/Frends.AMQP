@@ -10,4 +10,4 @@ public enum SearchCertificateBy
     Issuer,
     File
 #pragma warning restore CS1591 // self explanatory
-};
+}
