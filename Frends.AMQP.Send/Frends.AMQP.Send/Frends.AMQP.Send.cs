@@ -7,8 +7,10 @@ using System.Net.Security;
 using Amqp.Sasl;
 using System.Linq;
 using System.ComponentModel;
-using System.Threading;
-using Frends.AMQP.Send.Definitions;
+ using Frends.AMQP.Send.Definitions;
+using ConnectionAmqp = Amqp.Connection;
+using Connection = Frends.AMQP.Send.Definitions.Connection;
+using Frends.AMQP.Send.Helpers;
 
 namespace Frends.AMQP.Send;
 
@@ -23,31 +25,42 @@ public static class AMQP
     /// </summary>
     /// <param name="input">Defines how to connect AMQP queue and message being sent.</param>
     /// <param name="options">Defines additional properties of connection.</param>
-    /// <param name="messageProperties">Defines additional properties of message.</param>
+    /// <param name="connection">Defines additional properties of message.</param>
     /// <returns>Object { bool Success }</returns>
-    public static async Task<Result> Send([PropertyTab] Input input, [PropertyTab] Options options, [PropertyTab] AmqpMessageProperties messageProperties)
+    public static async Task<Result> Send([PropertyTab] Input input, [PropertyTab] Options options, [PropertyTab] Connection connection)
     {
-        var conn = await CreateConnection(input.BusUri, options.SearchClientCertificateBy, options.DisableServerCertValidation, options.Issuer, options.PfxFilePath, options.PfxPassword);
-        var session = new Session(conn);
-        var sender = new SenderLink(session, options.LinkName, input.QueueOrTopicName);
-
         try
         {
-            await sender.SendAsync(CreateMessage(input.Message, messageProperties), new TimeSpan(0, 0, 0, options.Timeout));
-        }
-        finally
-        {
-            await sender.CloseAsync();
-            await session.CloseAsync();
-            await conn.CloseAsync();
+            var conn = await CreateConnection(connection.BusUri, connection.ClientCertificate, connection.DisableServerCertificateValidation, connection.CertificateIssuer, connection.CertificateFilePath, connection.CertificatePassword);
+            var session = new Session(conn);
+            var sender = new SenderLink(session, options.LinkName, input.QueueOrTopicName);
+
+            try
+            {
+                await sender.SendAsync(CreateMessage(input), new TimeSpan(0, 0, 0, options.Timeout));
+            }
+            finally
+            {
+                await sender.CloseAsync();
+                await session.CloseAsync();
+                await conn.CloseAsync();
+            }
+
+            return new Result
+            {
+                Success = true,
+            };
         }
 
-        return new Result(true);
+        catch (Exception ex)
+        {
+            return ErrorHandler.Handle(ex, options);
+        }
     }
 
-    private static Message CreateMessage(AmqpMessage amqpMessage, AmqpMessageProperties messageProperties)
+    private static Message CreateMessage(Input input)
     {
-        var message = new Message(amqpMessage.BodyAsString)
+        var message = new Message(input.Message.BodyAsString)
         {
             Properties = new Properties(),
             ApplicationProperties = new ApplicationProperties()
@@ -55,22 +68,22 @@ public static class AMQP
 
         try
         {
-            foreach (var applicationProperty in messageProperties.ApplicationProperties)
+            foreach (var applicationProperty in input.ApplicationProperties)
                 message.ApplicationProperties.Map.Add(applicationProperty.Name, applicationProperty.Value);
 
-            message.Properties.MessageId = messageProperties.Properties.MessageId;
-            message.Properties.AbsoluteExpiryTime = messageProperties.Properties.AbsoluteExpiryTime ?? DateTime.MaxValue;
-            message.Properties.ContentEncoding = messageProperties.Properties.ContentEncoding;
-            message.Properties.ContentType = messageProperties.Properties.ContentType;
-            message.Properties.CorrelationId = messageProperties.Properties.CorrelationId;
-            message.Properties.CreationTime = messageProperties.Properties.CreationTime ?? DateTime.UtcNow;
-            message.Properties.GroupId = messageProperties.Properties.GroupId;
-            message.Properties.GroupSequence = messageProperties.Properties.GroupSequence;
-            message.Properties.ReplyToGroupId = messageProperties.Properties.ReplyToGroupId;
-            message.Properties.ReplyTo = messageProperties.Properties.ReplyTo;
-            message.Properties.Subject = messageProperties.Properties.Subject;
-            message.Properties.UserId = messageProperties.Properties.UserId;
-            message.Properties.To = messageProperties.Properties.To;
+            message.Properties.MessageId = input.MessageProperties.MessageId;
+            message.Properties.AbsoluteExpiryTime = input.MessageProperties.AbsoluteExpiryTime ?? DateTime.MaxValue;
+            message.Properties.ContentEncoding = input.MessageProperties.ContentEncoding;
+            message.Properties.ContentType = input.MessageProperties.ContentType;
+            message.Properties.CorrelationId = input.MessageProperties.CorrelationId;
+            message.Properties.CreationTime = input.MessageProperties.CreationTime ?? DateTime.UtcNow;
+            message.Properties.GroupId = input.MessageProperties.GroupId;
+            message.Properties.GroupSequence = input.MessageProperties.GroupSequence;
+            message.Properties.ReplyToGroupId = input.MessageProperties.ReplyToGroupId;
+            message.Properties.ReplyTo = input.MessageProperties.ReplyTo;
+            message.Properties.Subject = input.MessageProperties.Subject;
+            message.Properties.UserId = input.MessageProperties.UserId;
+            message.Properties.To = input.MessageProperties.To;
         }
         catch
         {
@@ -102,12 +115,12 @@ public static class AMQP
     }
 
     static readonly RemoteCertificateValidationCallback noneCertValidator = (a, b, c, d) => true;
-    private static async Task<Connection> CreateConnection(string busUri, SearchCertificateBy searchClientCertificateBy, bool disableServerCertValidation, string issuer, string pfxFilePath, string pfxPassword)
+    private static async Task<ConnectionAmqp> CreateConnection(string busUri, SearchCertificateBy searchClientCertificateBy, bool disableServerCertValidation, string issuer, string pfxFilePath, string pfxPassword)
     {
         var factory = new ConnectionFactory();
         var brokerAddress = new Address(busUri);
 
-        if (searchClientCertificateBy == SearchCertificateBy.DontUseCertificate)
+        if (searchClientCertificateBy == SearchCertificateBy.None)
         {
             if (disableServerCertValidation)
                 factory.SSL.RemoteCertificateValidationCallback = noneCertValidator;

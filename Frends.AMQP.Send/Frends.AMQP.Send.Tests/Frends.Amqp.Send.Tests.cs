@@ -39,21 +39,21 @@ public class AMQPSendTests
         {
             Timeout = 15,
             LinkName = Guid.NewGuid().ToString(),
-            SearchClientCertificateBy = SearchCertificateBy.DontUseCertificate,
-            DisableServerCertValidation = true
         };
 
         var sender = new Input
         {
             Message = new AmqpMessage { BodyAsString = "Hello AMQP!" },
             QueueOrTopicName = queue,
-            BusUri = SecureBusAddress
+            ApplicationProperties = new[] { new ApplicationProperty { Name = "test", Value = "value" } },
+            MessageProperties = new AmqpProperties { MessageId = Guid.NewGuid().ToString() }
         };
 
-        var amqpMessageProperties = new AmqpMessageProperties
+        var amqpMessageProperties = new Connection
         {
-            ApplicationProperties = new[] { new ApplicationProperty { Name = "test", Value = "value" } },
-            Properties = new AmqpProperties { MessageId = Guid.NewGuid().ToString() }
+            BusUri = SecureBusAddress,
+            ClientCertificate = SearchCertificateBy.None,
+            DisableServerCertificateValidation = true
         };
 
         var ret = await AMQP.Send(sender, optionsDontUseClientCert, amqpMessageProperties);

@@ -6,7 +6,7 @@
 public enum SearchCertificateBy
 {
 #pragma warning disable CS1591 // self explanatory
-    DontUseCertificate,
+    None,
     Issuer,
     File
 #pragma warning restore CS1591 // self explanatory
