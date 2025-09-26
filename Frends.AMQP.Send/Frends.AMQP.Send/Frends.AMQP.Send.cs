@@ -7,7 +7,7 @@ using System.Net.Security;
 using Amqp.Sasl;
 using System.Linq;
 using System.ComponentModel;
- using Frends.AMQP.Send.Definitions;
+using Frends.AMQP.Send.Definitions;
 using ConnectionAmqp = Amqp.Connection;
 using Connection = Frends.AMQP.Send.Definitions.Connection;
 using Frends.AMQP.Send.Helpers;
