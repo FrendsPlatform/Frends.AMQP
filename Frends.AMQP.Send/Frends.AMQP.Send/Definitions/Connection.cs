@@ -19,7 +19,7 @@ namespace Frends.AMQP.Send.Definitions
         /// <summary>
         /// Select whether certificate is used and where it can be found.
         /// </summary>
-        /// <example>DontUseCertificate</example>
+        /// <example>None</example>
         [DefaultValue(SearchCertificateBy.None)]
         public SearchCertificateBy ClientCertificate { get; set; }
 
@@ -43,6 +43,7 @@ namespace Frends.AMQP.Send.Definitions
         /// Password for the certificate.
         /// </summary>
         /// <example>123</example>
+        [PasswordPropertyText(true)]
         [UIHint(nameof(ClientCertificate), "", SearchCertificateBy.File)]
         [DisplayFormat(DataFormatString = "Text")]
         public string CertificatePassword { get; set; }

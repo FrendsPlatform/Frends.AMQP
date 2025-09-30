@@ -25,8 +25,8 @@ public static class AMQP
     /// </summary>
     /// <param name="input">Defines how to connect AMQP queue and message being sent.</param>
     /// <param name="options">Defines additional properties of connection.</param>
-    /// <param name="connection">Defines additional properties of message.</param>
-    /// <returns>Object { bool Success }</returns>
+    /// <param name="connection">Defines connection configuration including URI, certificates, and TLS settings.</param>
+    /// <returns>Result { bool Success, Error Error }</returns>
     public static async Task<Result> Send([PropertyTab] Input input, [PropertyTab] Options options, [PropertyTab] Connection connection)
     {
         try

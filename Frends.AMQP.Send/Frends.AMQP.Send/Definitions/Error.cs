@@ -1,3 +1,5 @@
+using System;
+
 namespace Frends.AMQP.Send.Definitions;
 
 /// <summary>
@@ -17,5 +19,5 @@ public class Error
     /// Contains structured data that can be useful for automated error handling and logging.
     /// </summary>
     /// <example>{ "ExceptionType": "ArgumentException", "StackTrace": "..." }</example>
-    public object AdditionalInfo { get; init; }
+    public Exception AdditionalInfo { get; init; }
 }

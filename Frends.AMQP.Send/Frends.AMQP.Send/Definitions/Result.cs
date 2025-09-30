@@ -15,5 +15,12 @@ public class Result
     /// Error information when the sending message fails and ThrowErrorOnFailure option is set to false.
     /// Contains detailed error message and additional debugging information.
     /// </summary>
+    /// <example>
+    /// {
+    ///     "Message": "Sending failed",
+    ///     "AdditionalInfo": {
+    ///         "ExceptionType": "ArgumentException"
+    ///     }
+    /// }</example>
     public Error Error { get; set; }
 }

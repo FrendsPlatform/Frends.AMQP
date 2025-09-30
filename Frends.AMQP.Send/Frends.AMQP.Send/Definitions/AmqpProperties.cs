@@ -67,11 +67,7 @@ public class AmqpProperties
     /// </summary>
     /// <example>0</example>
     [DefaultValue(0)]
-    public UInt32 GroupSequence
-    {
-        get { return _groupSequence; }
-        set { _groupSequence = value; }
-    }
+    public uint GroupSequence { get; set; }
 
     /// <summary>
     /// Message's ReplyToGroupId.

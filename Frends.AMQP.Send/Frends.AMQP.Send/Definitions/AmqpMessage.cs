@@ -11,5 +11,5 @@ public class AmqpMessage
     /// </summary>
     /// <example>foobar!</example>
     [DisplayFormat(DataFormatString = "Text")]
-    public object BodyAsString { get; set; }
+    public string BodyAsString { get; set; }
 }
