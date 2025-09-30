@@ -8,8 +8,6 @@ namespace Frends.AMQP.Send.Definitions;
 /// </summary>
 public class AmqpProperties
 {
-    private uint _groupSequence;
-
     /// <summary>
     /// Message's id.
     /// </summary>
