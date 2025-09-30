@@ -12,7 +12,7 @@ public class Options
     /// </summary>
     /// <example>30</example>
     [DefaultValue(30)]
-    public int Timeout { get; set; }
+    public int Timeout { get; set; } = 30;
 
     /// <summary>
     /// Link name.
@@ -23,40 +23,20 @@ public class Options
     public string LinkName { get; set; }
 
     /// <summary>
-    /// Select whether certificate is used and where it can be found.
+    /// Determines error handling behavior. If true, throws an exception when task fails.
+    /// If false, returns error information in the Result object instead of throwing.
     /// </summary>
-    /// <example>DontUseCertificate</example>
-    [DefaultValue(SearchCertificateBy.DontUseCertificate)]
-    public SearchCertificateBy SearchClientCertificateBy { get; set; }
+    /// <example>true</example>
+    [DefaultValue(true)]
+    public bool ThrowErrorOnFailure { get; set; } = true;
 
     /// <summary>
-    /// Issuer of certificate.
+    /// Custom error message to use when ThrowErrorOnFailure is false and an error occurs.
+    /// If null or empty, the original exception message will be used.
+    /// This allows for user-friendly error messages in automated workflows.
     /// </summary>
-    /// <example>Issuer</example>
-    [UIHint(nameof(SearchClientCertificateBy), "", SearchCertificateBy.Issuer)]
+    /// <example>Failed to send message</example>
+    [DefaultValue("")]
     [DisplayFormat(DataFormatString = "Text")]
-    public string Issuer { get; set; }
-
-    /// <summary>
-    /// Path where .pfx (certificate) file can be found.
-    /// </summary>
-    /// <example>c:\Windows\foo.pfx</example>
-    [UIHint(nameof(SearchClientCertificateBy), "", SearchCertificateBy.File)]
-    [DisplayFormat(DataFormatString = "Text")]
-    public string PfxFilePath { get; set; }
-
-    /// <summary>
-    /// Password for the certificate.
-    /// </summary>
-    /// <example>123</example>
-    [UIHint(nameof(SearchClientCertificateBy), "", SearchCertificateBy.File)]
-    [DisplayFormat(DataFormatString = "Text")]
-    public string PfxPassword { get; set; }
-
-    /// <summary>
-    /// Disable server certificate validation when TLS is used. False means certificate is validated. If connection is not secured with tls this option does not do anything.
-    /// </summary>
-    /// <example>false</example>
-    [DefaultValue(false)]
-    public bool DisableServerCertValidation { get; set; }
+    public string ErrorMessageOnFailure { get; set; } = "";
 }

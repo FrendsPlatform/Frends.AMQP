@@ -15,5 +15,5 @@ public class ApplicationProperty
     /// Application property's value.
     /// </summary>
     /// <example>bar</example>
-    public object Value { get; set; }
+    public string Value { get; set; }
 }

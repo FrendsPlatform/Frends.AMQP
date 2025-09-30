@@ -9,10 +9,18 @@ public class Result
     /// True if Message was sent successfully.
     /// </summary>
     /// <example>true</example>
-    public bool Success { get; private set; }
+    public bool Success { get; set; }
 
-    internal Result(bool success)
-    {
-        Success = success;
-    }
+    /// <summary>
+    /// Error information when the sending message fails and ThrowErrorOnFailure option is set to false.
+    /// Contains detailed error message and additional debugging information.
+    /// </summary>
+    /// <example>
+    /// {
+    ///     "Message": "Sending failed",
+    ///     "AdditionalInfo": {
+    ///         "ExceptionType": "ArgumentException"
+    ///     }
+    /// }</example>
+    public Error Error { get; set; }
 }

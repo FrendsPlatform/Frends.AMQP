@@ -1,0 +1,66 @@
+[
+  {
+    "Task": "Frends.AMQP.Send",
+    "Migrations": [
+      {
+        "Version": "2.0.0",
+        "Description": "Major refactoring: reorganized connection parameters, renamed certificate-related options, standardized error handling, and updated result structure",
+        "Migration": [
+          {
+            "Type": "Copy",
+            "Source": "AmqpMessageProperties.Properties",
+            "Target": "Input.MessageProperties"
+          },
+          {
+            "Type": "Copy",
+            "Source": "AmqpMessageProperties.ApplicationProperties",
+            "Target": "Input.ApplicationProperties"
+          },
+          {
+            "Type": "Copy",
+            "Source": "Input.BusUri",
+            "Target": "Connection.BusUri"
+          },
+          {
+            "Type": "Copy",
+            "Source": "Options.Issuer",
+            "Target": "Connection.CertificateIssuer"
+          },
+          {
+            "Type": "Copy",
+            "Source": "Options.PfxFilePath",
+            "Target": "Connection.CertificateFilePath"
+          },
+          {
+            "Type": "Copy",
+            "Source": "Options.PfxPassword",
+            "Target": "Connection.CertificatePassword"
+          },
+          {
+            "Type": "Copy",
+            "Source": "Options.DisableServerCertValidation",
+            "Target": "Connection.DisableServerCertificateValidation"
+          },
+          {
+            "Type": "Map",
+            "Source": "Options.SearchClientCertificateBy",
+            "Target": "Connection.ClientCertificate",
+            "Maps": {
+              "DontUseCertificate": "None"
+            }
+          },
+          {
+            "Type": "Set",
+            "Target": "Options.ThrowErrorOnFailure",
+            "Value": "true"
+          },
+          {
+            "Type": "Set",
+            "Target": "Options.ErrorMessageOnFailure",
+            "Value": "\"\""
+          }
+        ]
+      }
+    ]
+  }
+]
