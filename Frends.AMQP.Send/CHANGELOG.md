@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.0.0] - 2026-07-20
+
+### Changed
+- [Breaking] The **Connection** tab is now the second parameter (after **Input**), and **Options** is the third. This matches the standard Frends task parameter order.
+- Added support for cancellation: the task now respects cancellation tokens passed by the Frends platform.
+
 ## [2.0.0] - 2025-09-24
 
 ### Added
