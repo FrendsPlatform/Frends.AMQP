@@ -56,7 +56,7 @@ public class AMQPSendTests
             DisableServerCertificateValidation = true
         };
 
-        var ret = await AMQP.Send(sender, optionsDontUseClientCert, amqpMessageProperties);
+        var ret = await AMQP.Send(sender, amqpMessageProperties, optionsDontUseClientCert, default);
         Assert.NotNull(ret);
         Assert.That(ret.Success, Is.True);
     }
@@ -88,7 +88,7 @@ public class AMQPSendTests
             DisableServerCertificateValidation = true
         };
 
-        var result = await AMQP.Send(input, options, connection);
+        var result = await AMQP.Send(input, connection, options, default);
         Assert.That(result.Success, Is.False);
         Assert.That(result.Error, Is.Not.Null);
         Assert.That(result.Error.Message, Does.Contain("Could not find"));
@@ -120,7 +120,7 @@ public class AMQPSendTests
             DisableServerCertificateValidation = true
         };
 
-        var result = await AMQP.Send(input, options, connection);
+        var result = await AMQP.Send(input, connection, options, default);
         Assert.That(result.Success, Is.False);
         Assert.That(result.Error, Is.Not.Null);
     }
@@ -150,7 +150,7 @@ public class AMQPSendTests
             DisableServerCertificateValidation = true
         };
 
-        var result = await AMQP.Send(input, options, connection);
+        var result = await AMQP.Send(input, connection, options, default);
         Assert.That(result.Success, Is.False);
         Assert.That(result.Error.Message, Does.Contain("Error in message properties").Or.Contain("Object reference"));
     }

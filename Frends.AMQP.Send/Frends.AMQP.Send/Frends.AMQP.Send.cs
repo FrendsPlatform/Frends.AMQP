@@ -1,6 +1,7 @@
 ﻿using System;
 using Amqp;
 using Amqp.Framing;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
@@ -24,13 +25,15 @@ public static class AMQP
     /// [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends.AMQP.Send)
     /// </summary>
     /// <param name="input">Defines how to connect AMQP queue and message being sent.</param>
-    /// <param name="options">Defines additional properties of connection.</param>
     /// <param name="connection">Defines connection configuration including URI, certificates, and TLS settings.</param>
+    /// <param name="options">Defines additional properties of connection.</param>
+    /// <param name="cancellationToken">Token to cancel the operation.</param>
     /// <returns>Result { bool Success, Error Error }</returns>
-    public static async Task<Result> Send([PropertyTab] Input input, [PropertyTab] Options options, [PropertyTab] Connection connection)
+    public static async Task<Result> Send([PropertyTab] Input input, [PropertyTab] Connection connection, [PropertyTab] Options options, CancellationToken cancellationToken)
     {
         try
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var conn = await CreateConnection(connection.BusUri, connection.ClientCertificate, connection.DisableServerCertificateValidation, connection.CertificateIssuer, connection.CertificateFilePath, connection.CertificatePassword);
             var session = new Session(conn);
             var sender = new SenderLink(session, options.LinkName, input.QueueOrTopicName);
